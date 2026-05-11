@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Bitácora de Eventos - AuditFlow{% endblock %}
+{% block page_title %}Bitácora de Auditoría de Sistema{% endblock %}
+{% block page_subtitle %}Registro detallado de acciones y eventos realizados por los usuarios en la plataforma.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .log-container {
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .log-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .log-table th {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 12px 16px;
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--text-color);
+        text-align: left;
+        border-bottom: 1px solid var(--surface-border);
+    }
+
+    .log-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 13px;
+        color: var(--title-color);
+    }
+
+    .timestamp { font-family: monospace; color: var(--primary-color); opacity: 0.9; }
+    .user-tag { background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+    .action-badge { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    
+    .action-creacion { background: rgba(63, 185, 80, 0.15); color: #3fb950; }
+    .action-actualizacion { background: rgba(88, 166, 255, 0.15); color: #58a6ff; }
+    .action-eliminacion { background: rgba(248, 81, 73, 0.15); color: #ff7b72; }
+    .action-default { background: rgba(255,255,255, 0.1); color: var(--text-color); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="log-container">
+    <table class="log-table">
+        <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Módulo</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for evento in eventos %}
+            <tr>
+                <td class="timestamp">{{ evento.fecha_hora|date:"Y-m-d H:i:s" }}</td>
+                <td><span class="user-tag">{{ evento.usuario.username|default:"Sistema" }}</span></td>
+                <td>
+                    {% if 'Cre' in evento.accion or 'Prop' in evento.accion or 'Rep' in evento.accion or 'Carga' in evento.accion %}
+                        <span class="action-badge action-creacion">{{ evento.accion }}</span>
+                    {% elif 'Act' in evento.accion %}
+                        <span class="action-badge action-actualizacion">{{ evento.accion }}</span>
+                    {% elif 'Elim' in evento.accion %}
+                        <span class="action-badge action-eliminacion">{{ evento.accion }}</span>
+                    {% else %}
+                        <span class="action-badge action-default">{{ evento.accion }}</span>
+                    {% endif %}
+                </td>
+                <td style="font-weight: 600; opacity: 0.8;">{{ evento.modulo }}</td>
+                <td>{{ evento.descripcion }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; opacity: 0.5;">No hay registros en la bitácora.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<div style="margin-top: 24px; display: flex; justify-content: center; gap: 8px;">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="glass-panel" style="padding: 8px 16px; text-decoration: none;">Anterior</a>
+    {% endif %}
+    <span style="padding: 8px 16px; background: rgba(255,255,255,0.05); border-radius: 8px;">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="glass-panel" style="padding: 8px 16px; text-decoration: none;">Siguiente</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

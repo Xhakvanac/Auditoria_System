@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}Evidencias - AuditFlow{% endblock %}
+{% block page_title %}Repositorio de Evidencias{% endblock %}
+{% block page_subtitle %}Centraliza los archivos, documentos y fotos probatorias vinculados a las auditorías.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 16px;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 10px 16px;
+        flex: 1;
+        max-width: 400px;
+        transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 12px rgba(88, 166, 255, 0.2);
+    }
+
+    .search-bar i {
+        color: var(--text-color);
+        font-size: 18px;
+        opacity: 0.6;
+        margin-right: 12px;
+    }
+
+    .search-bar input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--title-color);
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .btn-action {
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(88, 166, 255, 0.4);
+    }
+
+    .table-container {
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .premium-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .premium-table th {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 16px 24px;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--surface-border);
+    }
+
+    .premium-table td {
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--title-color);
+        font-size: 14px;
+        transition: background 0.2s ease;
+    }
+
+    .premium-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .identifier {
+        font-family: monospace;
+        font-weight: 600;
+        color: #c9d1d9;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .identifier-ref {
+        font-family: monospace;
+        font-size: 12px;
+        color: var(--accent-green);
+        background: rgba(35, 134, 54, 0.15);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    /* Estados de las evidencias */
+    .badge-aprobada { background: rgba(35,134,54, 0.15); color: #3fb950; border: 1px solid rgba(35,134,54, 0.3); }
+    .badge-rechazada { background: rgba(218,54,51, 0.15); color: #ff7b72; border: 1px solid rgba(218,54,51, 0.3); }
+    .badge-pendiente { background: rgba(242, 204, 96, 0.15); color: #f2cc60; border: 1px solid rgba(242, 204, 96, 0.3); }
+
+    /* Tipo de Archivo Íconos */
+    .file-icon {
+        font-size: 24px;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .file-icon.img { color: #bc8cff; }
+    .file-icon.doc { color: #58a6ff; }
+    .file-icon.vid { color: #ff7b72; }
+
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btns .btn-icon {
+        background: rgba(255,255,255, 0.05);
+        border: 1px solid rgba(255,255,255, 0.1);
+        color: var(--text-color);
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-btns .btn-icon:hover {
+        background: rgba(88, 166, 255, 0.2);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="toolbar">
+    <div class="search-bar">
+        <i class='bx bx-search'></i>
+        <input type="text" placeholder="Buscar por Nombre de archivo o Referencia...">
+    </div>
+    
+    <a href="{% url 'subir_evidencia' %}" class="btn-action" style="text-decoration: none;">
+        <i class='bx bx-upload'></i>
+        Subir Evidencia
+    </a>
+</div>
+
+<div class="table-container">
+    <table class="premium-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Referencia Acción</th>
+                <th>Archivo</th>
+                <th>Subido Por</th>
+                <th>Fecha Subida</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ev in lista_evidencias %}
+            <tr>
+                <td><span class="identifier">EVI-{{ ev.id|stringformat:"03d" }}</span></td>
+                <td><span class="identifier-ref"><i class='bx bx-link-alt'></i> ACC-{{ ev.accion.id|stringformat:"03d" }}</span></td>
+                <td>
+                    <div style="display: flex; align-items: center;">
+                        {% with extension=ev.archivo.name|slice:"-3:" %}
+                            {% if extension == "jpg" or extension == "png" or extension == "peg" %}
+                                <i class='bx bxs-image file-icon img'></i>
+                            {% elif extension == "pdf" %}
+                                <i class='bx bxs-file-pdf file-icon doc'></i>
+                            {% else %}
+                                <i class='bx bxs-file file-icon doc'></i>
+                            {% endif %}
+                        {% endwith %}
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: 500;">{{ ev.archivo.name|slice:"11:" }}</span>
+                            <span style="font-size: 11px; opacity: 0.6;">{{ ev.descripcion|truncatechars:30 }}</span>
+                        </div>
+                    </div>
+                </td>
+                <td style="font-size: 13px;">{{ ev.subido_por.get_full_name|default:ev.subido_por.username }}</td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">
+                        <span>{{ ev.fecha_subida|date:"d/m/Y H:i" }}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{{ ev.archivo.url }}" target="_blank" class="btn-icon" title="Ver / Descargar"><i class='bx bx-cloud-download'></i></a>
+                        <a href="{% url 'eliminar_evidencia' ev.pk %}" class="btn-icon" title="Eliminar" style="color: var(--accent-red);"><i class='bx bx-trash'></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 48px; opacity: 0.6;">
+                    <i class='bx bx-cloud' style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <p>No hay evidencias documentales cargadas en el sistema.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

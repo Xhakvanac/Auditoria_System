@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Auditoría - AuditFlow{% endblock %}
+{% block page_title %}Eliminar Auditoría{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; text-align: center;">
+    <div class="glass-panel">
+        <i class='bx bx-error-circle' style="font-size: 64px; color: var(--accent-red); margin-bottom: 24px;"></i>
+        <h2 style="color: var(--title-color); margin-bottom: 16px;">¿Está seguro de eliminar esta auditoría?</h2>
+        <p style="opacity: 0.8; margin-bottom: 32px;">
+            Esta acción no se puede deshacer. Se eliminará la auditoría <strong>"{{ object.titulo }}"</strong> y todos sus datos asociados.
+        </p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; justify-content: center; gap: 16px;">
+                <a href="{% url 'lista_auditorias' %}" class="glass-panel" style="padding: 12px 24px; text-decoration: none; font-weight: 500;">Cancelar</a>
+                <button type="submit" style="background: var(--accent-red); color: white; border: none; border-radius: 12px; padding: 12px 32px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                    Sí, Eliminar permanentemente
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

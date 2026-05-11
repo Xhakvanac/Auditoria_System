@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}Hallazgos - AuditFlow{% endblock %}
+{% block page_title %}Sistema de Hallazgos{% endblock %}
+{% block page_subtitle %}Visualiza las no conformidades detectadas, clasifícalas y da seguimiento a su resolución.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 16px;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 10px 16px;
+        flex: 1;
+        max-width: 400px;
+        transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 12px rgba(88, 166, 255, 0.2);
+    }
+
+    .search-bar i {
+        color: var(--text-color);
+        font-size: 18px;
+        opacity: 0.6;
+        margin-right: 12px;
+    }
+
+    .search-bar input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--title-color);
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .btn-action {
+        background: var(--accent-red);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(218, 54, 51, 0.3);
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(218, 54, 51, 0.4);
+    }
+
+    .table-container {
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .premium-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .premium-table th {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 16px 24px;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--surface-border);
+    }
+
+    .premium-table td {
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--title-color);
+        font-size: 14px;
+        transition: background 0.2s ease;
+    }
+
+    .premium-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .identifier {
+        font-family: monospace;
+        font-weight: 600;
+        color: var(--accent-purple);
+        background: rgba(188, 140, 255, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .identifier-ref {
+        font-family: monospace;
+        font-size: 12px;
+        color: var(--text-color);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    /* Estados del Hallazgo */
+    .badge-abierto { background: rgba(218,54,51, 0.15); color: #ff7b72; border: 1px solid rgba(218,54,51, 0.3); }
+    .badge-revision { background: rgba(188,140,255, 0.15); color: #bc8cff; border: 1px solid rgba(188,140,255, 0.3); }
+    .badge-cerrado { background: rgba(35,134,54, 0.15); color: #3fb950; border: 1px solid rgba(35,134,54, 0.3); }
+
+    /* Criticidad */
+    .crit-alta { color: #ff7b72; font-weight: bold; }
+    .crit-media { color: #f2cc60; font-weight: bold; }
+    .crit-baja { color: #58a6ff; font-weight: bold; }
+
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btns .btn-icon {
+        background: rgba(255,255,255, 0.05);
+        border: 1px solid rgba(255,255,255, 0.1);
+        color: var(--text-color);
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-btns .btn-icon:hover {
+        background: rgba(188, 140, 255, 0.2);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="toolbar">
+    <div class="search-bar">
+        <i class='bx bx-search'></i>
+        <input type="text" placeholder="Buscar por Folio, Descripción o Área...">
+    </div>
+    
+    <a href="{% url 'crear_hallazgo' %}" class="btn-action" style="text-decoration: none;">
+        <i class='bx bx-message-square-error'></i>
+        Reportar Hallazgo
+    </a>
+</div>
+
+<div class="table-container">
+    <table class="premium-table">
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Auditoría Referencia</th>
+                <th>Descripción / Área</th>
+                <th>Criticidad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hl in lista_hallazgos %}
+            <tr>
+                <td><span class="identifier">HLZ-{{ hl.id|stringformat:"03d" }}</span></td>
+                <td><span class="identifier-ref"><i class='bx bx-link'></i> AUD-{{ hl.auditoria.id|stringformat:"03d" }}</span></td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <strong>{{ hl.descripcion|truncatechars:60 }}</strong>
+                        <span style="font-size: 12px; color: var(--text-color);"><i class='bx bx-map'></i> {{ hl.area }}</span>
+                    </div>
+                </td>
+                <td>
+                    {% if hl.criticidad == 'Alta' %}
+                        <span class="crit-alta"><i class='bx bxs-circle' style="font-size:10px;"></i> Alta</span>
+                    {% elif hl.criticidad == 'Media' %}
+                        <span class="crit-media"><i class='bx bxs-circle' style="font-size:10px;"></i> Media</span>
+                    {% else %}
+                        <span class="crit-baja"><i class='bx bxs-circle' style="font-size:10px;"></i> Baja</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if hl.estado == 'Abierto' %}
+                        <span class="badge badge-abierto">{{ hl.estado }}</span>
+                    {% elif 'Revisión' in hl.estado %}
+                        <span class="badge badge-revision">{{ hl.estado }}</span>
+                    {% else %}
+                        <span class="badge badge-cerrado">{{ hl.estado }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{% url 'editar_hallazgo' hl.pk %}" class="btn-icon" title="Editar"><i class='bx bx-edit-alt'></i></a>
+                        <a href="{% url 'eliminar_hallazgo' hl.pk %}" class="btn-icon" title="Eliminar" style="color: var(--accent-red);"><i class='bx bx-trash'></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 48px; opacity: 0.6;">
+                    <i class='bx bx-search-alt' style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <p>Genial, no se encontraron no conformidades registradas.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Auditorías - AuditFlow{% endblock %}
+{% block page_title %}Gestión de Auditorías{% endblock %}
+{% block page_subtitle %}Visualiza y administra todas las auditorías operativas registradas en el sistema.{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos propios de la Lista de Auditorías */
+    
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 16px;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 10px 16px;
+        flex: 1;
+        max-width: 400px;
+        transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 12px rgba(88, 166, 255, 0.2);
+    }
+
+    .search-bar i {
+        color: var(--text-color);
+        font-size: 18px;
+        opacity: 0.6;
+        margin-right: 12px;
+    }
+
+    .search-bar input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--title-color);
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(88, 166, 255, 0.4);
+    }
+
+    /* Modern Table with Glassmorphism */
+    .table-container {
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .premium-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .premium-table th {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 16px 24px;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--surface-border);
+    }
+
+    .premium-table td {
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--title-color);
+        font-size: 14px;
+        transition: background 0.2s ease;
+    }
+
+    .premium-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .premium-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .identifier {
+        font-family: monospace;
+        font-weight: 600;
+        color: var(--primary-color);
+        background: rgba(88, 166, 255, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .badge-progreso { background: rgba(88,166,255, 0.15); color: #58a6ff; border: 1px solid rgba(88,166,255, 0.3); }
+    .badge-completada { background: rgba(35,134,54, 0.15); color: #3fb950; border: 1px solid rgba(35,134,54, 0.3); }
+    .badge-planeada { background: rgba(188,140,255, 0.15); color: #bc8cff; border: 1px solid rgba(188,140,255, 0.3); }
+
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btns .btn-icon {
+        background: rgba(255,255,255, 0.05);
+        border: 1px solid rgba(255,255,255, 0.1);
+        color: var(--text-color);
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-btns .btn-icon:hover {
+        background: rgba(255,255,255, 0.15);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Herramientas superiores -->
+<div class="toolbar">
+    <div class="search-bar">
+        <i class='bx bx-search'></i>
+        <input type="text" placeholder="Buscar por Folio, Título o Auditor Líder...">
+    </div>
+    
+    <a href="{% url 'crear_auditoria' %}" class="btn-primary" style="text-decoration: none;">
+        <i class='bx bx-plus'></i>
+        Nueva Auditoría
+    </a>
+</div>
+
+<!-- Tabla Estética -->
+<div class="table-container">
+    <table class="premium-table">
+        <thead>
+            <tr>
+                <th>Folio</th>
+                <th>Título</th>
+                <th>Auditor Líder</th>
+                <th>Fecha Inicio</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aud in lista_auditorias %}
+            <tr>
+                <td><span class="identifier">AUD-{{ aud.id|stringformat:"03d" }}</span></td>
+                <td><strong>{{ aud.titulo }}</strong></td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class='bx bxs-user-circle' style="font-size: 20px; color: var(--text-color); opacity: 0.8;"></i>
+                        {{ aud.auditor_lider.get_full_name|default:aud.auditor_lider.username }}
+                    </div>
+                </td>
+                <td>{{ aud.fecha_inicio|date:"d/m/Y" }}</td>
+                <td>
+                    {% if aud.estado == 'En Progreso' %}
+                        <span class="badge badge-progreso"><i class='bx bx-loader-alt bx-spin' style="margin-right:4px;"></i> {{ aud.estado }}</span>
+                    {% elif aud.estado == 'Completada' or aud.estado == 'Finalizada' %}
+                        <span class="badge badge-completada"><i class='bx bx-check-shield' style="margin-right:4px;"></i> {{ aud.estado }}</span>
+                    {% else %}
+                        <span class="badge badge-planeada"><i class='bx bx-stopwatch' style="margin-right:4px;"></i> {{ aud.estado }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{% url 'reporte_auditoria_pdf' aud.pk %}" class="btn-icon" title="Descargar PDF" style="color: var(--primary-color);"><i class='bx bxs-file-pdf'></i></a>
+                        <a href="{% url 'editar_auditoria' aud.pk %}" class="btn-icon" title="Editar"><i class='bx bx-edit-alt'></i></a>
+                        <a href="{% url 'eliminar_auditoria' aud.pk %}" class="btn-icon" title="Eliminar" style="color: var(--accent-red);"><i class='bx bx-trash'></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 32px; opacity: 0.6;">
+                    <i class='bx bx-folder-open' style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <p>No se encontraron auditorías registradas.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Sistema de Auditoría{% endblock %}
+{% block page_title %}Dashboard de Control{% endblock %}
+{% block page_subtitle %}Vista general del estado de las auditorías e incidencias.{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard Specific Styles */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .metric-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .metric-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+    }
+
+    .metric-icon.blue {
+        background: rgba(88, 166, 255, 0.15);
+        color: var(--primary-color);
+        box-shadow: 0 0 16px rgba(88, 166, 255, 0.2);
+    }
+
+    .metric-icon.green {
+        background: rgba(35, 134, 54, 0.15);
+        color: #3fb950;
+        box-shadow: 0 0 16px rgba(35, 134, 54, 0.2);
+    }
+
+    .metric-icon.red {
+        background: rgba(218, 54, 51, 0.15);
+        color: #ff7b72;
+        box-shadow: 0 0 16px rgba(218, 54, 51, 0.2);
+    }
+
+    .metric-icon.purple {
+        background: rgba(188, 140, 255, 0.15);
+        color: var(--accent-purple);
+        box-shadow: 0 0 16px rgba(188, 140, 255, 0.2);
+    }
+
+    .metric-info h3 {
+        color: var(--text-color);
+        font-size: 13px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.8;
+    }
+
+    .metric-info p {
+        color: var(--title-color);
+        font-size: 28px;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+    .dashboard-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+    }
+
+    .section-title {
+        color: var(--title-color);
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .recent-activity {
+        list-style: none;
+    }
+
+    .activity-item {
+        padding: 16px 0;
+        border-bottom: 1px solid var(--surface-border);
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .activity-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-top: 6px;
+    }
+
+    .activity-dot.red { background: #ff7b72; box-shadow: 0 0 8px #ff7b72; }
+    .activity-dot.green { background: #3fb950; box-shadow: 0 0 8px #3fb950; }
+    .activity-dot.blue { background: var(--primary-color); box-shadow: 0 0 8px var(--primary-color); }
+
+    .activity-details p {
+        font-size: 14px;
+        color: var(--title-color);
+        line-height: 1.5;
+    }
+
+    .activity-details span {
+        font-size: 12px;
+        color: var(--text-color);
+        opacity: 0.7;
+        margin-top: 4px;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="metrics-grid">
+    <div class="glass-panel metric-card">
+        <div class="metric-icon blue">
+            <i class='bx bx-folder-open'></i>
+        </div>
+        <div class="metric-info">
+            <h3>Total Auditorías</h3>
+            <p>{{ total_auditorias|default:"0" }}</p>
+        </div>
+    </div>
+    
+    <div class="glass-panel metric-card">
+        <div class="metric-icon red">
+            <i class='bx bx-error-circle'></i>
+        </div>
+        <div class="metric-info">
+            <h3>Hallazgos Reportados</h3>
+            <p>{{ total_hallazgos|default:"0" }}</p>
+        </div>
+    </div>
+
+    <div class="glass-panel metric-card">
+        <div class="metric-icon green">
+            <i class='bx bx-check-double'></i>
+        </div>
+        <div class="metric-info">
+            <h3>Planes de Acción</h3>
+            <p>{{ total_acciones|default:"0" }}</p>
+        </div>
+    </div>
+
+    <div class="glass-panel metric-card">
+        <div class="metric-icon purple">
+            <i class='bx bx-file-find'></i>
+        </div>
+        <div class="metric-info">
+            <h3>Evidencias Totales</h3>
+            <p>{{ total_evidencias|default:"0" }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-layout">
+    <div class="glass-panel">
+        <h2 class="section-title">Análisis de Hallazgos</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; align-items: center; height: 260px;">
+            <div>
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div>
+                <canvas id="critChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-panel">
+        <h2 class="section-title">Auditorías Recientes</h2>
+        <ul class="recent-activity">
+            {% for aud in ultimas_auditorias %}
+            <li class="activity-item">
+                <div class="activity-dot {% if aud.criticidad == 'Alta' %}red{% elif aud.criticidad == 'Media' %}blue{% else %}green{% endif %}"></div>
+                <div class="activity-details">
+                    <p>{{ aud.titulo }}</p>
+                    <span>{{ aud.fecha_inicio|date:"d/m/Y" }} &bull; {{ aud.area }}</span>
+                </div>
+            </li>
+            {% empty %}
+            <li class="activity-item">
+                <div class="activity-details">
+                    <p style="opacity: 0.5;">No hay auditorías registradas aún.</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Configuración Global de Chart.js para modo oscuro/premium
+    Chart.defaults.color = '#c9d1d9';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    // 1. Gráfica de Estados (Doughnut)
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Abiertos', 'Revisión', 'Cerrados'],
+            datasets: [{
+                data: [{{ hallazgos_abiertos }}, {{ hallazgos_revision }}, {{ hallazgos_cerrados }}],
+                backgroundColor: [
+                    'rgba(255, 123, 114, 0.6)', 
+                    'rgba(188, 140, 255, 0.6)', 
+                    'rgba(63, 185, 80, 0.6)'
+                ],
+                borderColor: [
+                    '#ff7b72', '#bc8cff', '#3fb950'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } }
+            },
+            cutout: '70%'
+        }
+    });
+
+    // 2. Gráfica de Criticidad (Bar)
+    const ctxCrit = document.getElementById('critChart').getContext('2d');
+    new Chart(ctxCrit, {
+        type: 'bar',
+        data: {
+            labels: ['Alta', 'Media', 'Baja'],
+            datasets: [{
+                label: 'Hallazgos por Criticidad',
+                data: [{{ crit_alta }}, {{ crit_media }}, {{ crit_baja }}],
+                backgroundColor: [
+                    'rgba(255, 123, 114, 0.4)',
+                    'rgba(242, 204, 96, 0.4)',
+                    'rgba(88, 166, 255, 0.4)'
+                ],
+                borderColor: [
+                    '#ff7b72', '#f2cc60', '#58a6ff'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { grid: { display: false } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
+{% endblock %}

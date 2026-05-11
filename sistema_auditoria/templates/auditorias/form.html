@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nueva{% endif %} Auditoría - AuditFlow{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Editar{% else %}Nueva{% endif %} Auditoría{% endblock %}
+{% block page_subtitle %}Complete los campos necesarios para gestionar el registro de la auditoría.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-card {
+        background: var(--surface-color);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--surface-border);
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .form-group-full {
+        grid-column: 1 / -1;
+    }
+
+    .glass-input:focus {
+        border-color: var(--primary-color);
+        background: rgba(88, 166, 255, 0.08);
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+    }
+
+    .form-actions {
+        margin-top: 32px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-purple));
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 32px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(88, 166, 255, 0.3);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4);
+    }
+
+    .btn-cancel {
+        background: transparent;
+        color: var(--text-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--title-color);
+    }
+
+    .errorlist {
+        color: var(--accent-red);
+        font-size: 12px;
+        margin-top: 4px;
+        list-style: none;
+        padding: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="glass-card">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="{{ form.folio.id_for_label }}">{{ form.folio.label }}</label>
+                    {{ form.folio }}
+                    {{ form.folio.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.area.id_for_label }}">{{ form.area.label }}</label>
+                    {{ form.area }}
+                    {{ form.area.errors }}
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="{{ form.titulo.id_for_label }}">{{ form.titulo.label }}</label>
+                    {{ form.titulo }}
+                    {{ form.titulo.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.norma.id_for_label }}">{{ form.norma.label }}</label>
+                    {{ form.norma }}
+                    {{ form.norma.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.auditor_lider.id_for_label }}">{{ form.auditor_lider.label }}</label>
+                    {{ form.auditor_lider }}
+                    {{ form.auditor_lider.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.fecha_inicio.id_for_label }}">{{ form.fecha_inicio.label }}</label>
+                    {{ form.fecha_inicio }}
+                    {{ form.fecha_inicio.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.fecha_fin.id_for_label }}">{{ form.fecha_fin.label }}</label>
+                    {{ form.fecha_fin }}
+                    {{ form.fecha_fin.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.estado.id_for_label }}">{{ form.estado.label }}</label>
+                    {{ form.estado }}
+                    {{ form.estado.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.criticidad.id_for_label }}">{{ form.criticidad.label }}</label>
+                    {{ form.criticidad }}
+                    {{ form.criticidad.errors }}
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {{ form.descripcion.errors }}
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="{{ form.alcance.id_for_label }}">{{ form.alcance.label }}</label>
+                    {{ form.alcance }}
+                    {{ form.alcance.errors }}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'lista_auditorias' %}" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">
+                    <i class='bx bx-save' style="margin-right: 8px;"></i>
+                    {% if form.instance.pk %}Guardar Cambios{% else %}Crear Auditoría{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

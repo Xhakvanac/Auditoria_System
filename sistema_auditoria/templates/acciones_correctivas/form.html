@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Nueva{% endif %} Acción Correctiva - AuditFlow{% endblock %}
+{% block page_title %}{% if form.instance.pk %}Editar{% else %}Proponer{% endif %} Acción Correctiva{% endblock %}
+{% block page_subtitle %}Defina las medidas necesarias para corregir la no conformidad detectada.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container { max-width: 800px; margin: 0 auto; }
+    .glass-card {
+        background: var(--surface-color);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--surface-border);
+        border-radius: 16px;
+        padding: 32px;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .form-group-full { grid-column: 1 / -1; }
+    .glass-input:focus { 
+        border-color: var(--accent-green); 
+        background: rgba(35, 134, 54, 0.08); 
+        box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.15);
+    }
+    .btn-save {
+        background: linear-gradient(135deg, var(--accent-green), #1b662a);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 32px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .btn-cancel {
+        background: transparent;
+        color: var(--text-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 12px 24px;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="glass-card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group form-group-full">
+                    <label for="{{ form.hallazgo.id_for_label }}">{{ form.hallazgo.label }}</label>
+                    {{ form.hallazgo }}
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.responsable.id_for_label }}">{{ form.responsable.label }}</label>
+                    {{ form.responsable }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.fecha_compromiso.id_for_label }}">{{ form.fecha_compromiso.label }}</label>
+                    {{ form.fecha_compromiso }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.estado.id_for_label }}">{{ form.estado.label }}</label>
+                    {{ form.estado }}
+                </div>
+            </div>
+
+            <div style="margin-top: 32px; display: flex; justify-content: flex-end; gap: 16px;">
+                <a href="{% url 'lista_acciones' %}" class="btn-cancel">Cancelar</a>
+                <button type="submit" class="btn-save">
+                    {% if form.instance.pk %}Guardar Cambios{% else %}Registrar Plan{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

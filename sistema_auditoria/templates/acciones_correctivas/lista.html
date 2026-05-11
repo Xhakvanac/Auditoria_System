@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block title %}Acciones Correctivas - AuditFlow{% endblock %}
+{% block page_title %}Planes de Acción{% endblock %}
+{% block page_subtitle %}Administra las acciones correctivas propuestas para solventar cada no conformidad.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        gap: 16px;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--surface-border);
+        border-radius: 8px;
+        padding: 10px 16px;
+        flex: 1;
+        max-width: 400px;
+        transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 12px rgba(88, 166, 255, 0.2);
+    }
+
+    .search-bar i {
+        color: var(--text-color);
+        font-size: 18px;
+        opacity: 0.6;
+        margin-right: 12px;
+    }
+
+    .search-bar input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--title-color);
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .btn-action {
+        background: var(--accent-green);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(35, 134, 54, 0.3);
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(35, 134, 54, 0.4);
+    }
+
+    .table-container {
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .premium-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .premium-table th {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 16px 24px;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--surface-border);
+    }
+
+    .premium-table td {
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--title-color);
+        font-size: 14px;
+        transition: background 0.2s ease;
+    }
+
+    .premium-table tbody tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .identifier {
+        font-family: monospace;
+        font-weight: 600;
+        color: #58a6ff;
+        background: rgba(88, 166, 255, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .identifier-ref {
+        font-family: monospace;
+        font-size: 12px;
+        color: var(--accent-purple);
+        background: rgba(188, 140, 255, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    /* Estados de las acciones */
+    .badge-proceso { background: rgba(88,166,255, 0.15); color: #58a6ff; border: 1px solid rgba(88,166,255, 0.3); }
+    .badge-implementada { background: rgba(35,134,54, 0.15); color: #3fb950; border: 1px solid rgba(35,134,54, 0.3); }
+    .badge-retrasada { background: rgba(218,54,51, 0.15); color: #ff7b72; border: 1px solid rgba(218,54,51, 0.3); }
+
+    .action-btns {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btns .btn-icon {
+        background: rgba(255,255,255, 0.05);
+        border: 1px solid rgba(255,255,255, 0.1);
+        color: var(--text-color);
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .action-btns .btn-icon:hover {
+        background: rgba(35, 134, 54, 0.2);
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="toolbar">
+    <div class="search-bar">
+        <i class='bx bx-search'></i>
+        <input type="text" placeholder="Buscar por Plan, Responsable o Hallazgo...">
+    </div>
+    
+    <a href="{% url 'crear_accion' %}" class="btn-action" style="text-decoration: none;">
+        <i class='bx bx-check-square'></i>
+        Proponer Plan
+    </a>
+</div>
+
+<div class="table-container">
+    <table class="premium-table">
+        <thead>
+            <tr>
+                <th>ID Plan</th>
+                <th>Hallazgo Asoc.</th>
+                <th>Plan de Acción</th>
+                <th>Responsable</th>
+                <th>Fecha Límite</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for act in lista_acciones %}
+            <tr>
+                <td><span class="identifier">ACC-{{ act.id|stringformat:"03d" }}</span></td>
+                <td><span class="identifier-ref"><i class='bx bx-target-lock'></i> HLZ-{{ act.hallazgo.id|stringformat:"03d" }}</span></td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 4px; max-width: 300px;">
+                        <strong>{{ act.descripcion|truncatechars:100 }}</strong>
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-color);">
+                        <i class='bx bx-user'></i> {{ act.responsable.get_full_name|default:act.responsable.username }}
+                    </div>
+                </td>
+                <td style="font-size: 13px;">{{ act.fecha_compromiso|date:"d/m/Y" }}</td>
+                <td>
+                    {% if act.estado == 'En Proceso' %}
+                        <span class="badge badge-proceso">{{ act.estado }}</span>
+                    {% elif act.estado == 'Completada' %}
+                        <span class="badge badge-implementada">{{ act.estado }}</span>
+                    {% elif act.estado == 'Vencida' %}
+                        <span class="badge badge-retrasada">{{ act.estado }}</span>
+                    {% else %}
+                        <span class="badge badge-proceso" style="background: rgba(255,255,255,0.05); color: var(--text-color);">{{ act.estado }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-btns">
+                        <a href="{% url 'editar_accion' act.pk %}" class="btn-icon" title="Editar"><i class='bx bx-edit-alt'></i></a>
+                        <a href="{% url 'eliminar_accion' act.pk %}" class="btn-icon" title="Eliminar" style="color: var(--accent-red);"><i class='bx bx-trash'></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 48px; opacity: 0.6;">
+                    <i class='bx bx-wrench' style="font-size: 32px; margin-bottom: 8px;"></i>
+                    <p>No hay planes de acción pendientes de revisión.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

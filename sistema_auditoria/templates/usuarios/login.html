@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión — AuditFlow</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --surface-color: rgba(22, 27, 34, 0.85);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --primary-color: #58a6ff;
+            --primary-glow: rgba(88, 166, 255, 0.4);
+            --text-color: #c9d1d9;
+            --title-color: #f0f6fc;
+            --accent-purple: #bc8cff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(88, 166, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(188, 140, 255, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 60% 80%, rgba(63, 185, 80, 0.06) 0%, transparent 40%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        /* Animated background orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: rgba(88, 166, 255, 0.08);
+            top: -100px; left: -100px;
+            animation-delay: 0s;
+        }
+        .orb-2 {
+            width: 300px; height: 300px;
+            background: rgba(188, 140, 255, 0.08);
+            bottom: -80px; right: -80px;
+            animation-delay: 3s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+        /* Login Card */
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .login-card {
+            background: var(--surface-color);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--surface-border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04),
+                0 24px 48px rgba(0, 0, 0, 0.5);
+        }
+        /* Header */
+        .login-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .logo-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(88,166,255,0.2), rgba(188,140,255,0.2));
+            border: 1px solid rgba(88,166,255,0.3);
+            margin-bottom: 16px;
+        }
+        .logo-icon i {
+            font-size: 32px;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 10px var(--primary-glow));
+        }
+        .login-header h1 {
+            color: var(--title-color);
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .login-header p {
+            color: var(--text-color);
+            font-size: 14px;
+            margin-top: 6px;
+            opacity: 0.7;
+        }
+        /* Form elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: var(--text-color);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--text-color);
+            opacity: 0.5;
+            pointer-events: none;
+            transition: color 0.2s ease, opacity 0.2s ease;
+        }
+        .input-wrapper input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            padding: 12px 14px 12px 44px;
+            color: var(--title-color);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .input-wrapper input::placeholder {
+            color: var(--text-color);
+            opacity: 0.3;
+        }
+        .input-wrapper input:focus {
+            border-color: var(--primary-color);
+            background: rgba(88, 166, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+        }
+        .input-wrapper input:focus + i,
+        .input-wrapper:focus-within i {
+            color: var(--primary-color);
+            opacity: 1;
+        }
+        /* Toggle password visibility */
+        .toggle-password {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--text-color);
+            opacity: 0.4;
+            cursor: pointer;
+            pointer-events: all;
+            transition: opacity 0.2s;
+        }
+        .toggle-password:hover { opacity: 0.9; }
+        /* Error messages */
+        .error-list {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            list-style: none;
+        }
+        .error-list li {
+            color: var(--accent-red);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Submit button */
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-purple));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
+        }
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.4);
+        }
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        /* Footer hint */
+        .login-footer {
+            text-align: center;
+            margin-top: 28px;
+            color: var(--text-color);
+            font-size: 12px;
+            opacity: 0.5;
+        }
+        .login-footer i {
+            font-size: 14px;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">
+                    <i class='bx bx-check-shield'></i>
+                </div>
+                <h1>AuditFlow</h1>
+                <p>Ingresa tus credenciales para continuar</p>
+            </div>
+            {% if form.errors %}
+            <ul class="error-list">
+                <li>
+                    <i class='bx bx-error-circle'></i>
+                    Usuario o contraseña incorrectos. Por favor verifica e intenta de nuevo.
+                </li>
+            </ul>
+            {% endif %}
+            <form method="post" id="login-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_username">Usuario</label>
+                    <div class="input-wrapper">
+                        <i class='bx bx-user'></i>
+                        <input
+                            type="text"
+                            id="id_username"
+                            name="username"
+                            placeholder="Nombre de usuario"
+                            autocomplete="username"
+                            autofocus
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="id_password">Contraseña</label>
+                    <div class="input-wrapper">
+                        <i class='bx bx-lock-alt'></i>
+                        <input
+                            type="password"
+                            id="id_password"
+                            name="password"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <i class='bx bx-hide toggle-password' id="toggle-pwd"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login" id="btn-ingresar">
+                    <i class='bx bx-log-in-circle' style="font-size:18px; vertical-align:middle; margin-right:6px;"></i>
+                    Iniciar Sesión
+                </button>
+            </form>
+            <div class="login-footer">
+                <i class='bx bx-lock'></i>
+                Acceso restringido · Sistema de Gestión de Auditorías
+            </div>
+        </div>
+    </div>
+    <script>
+        // Toggle password visibility
+        const toggleBtn = document.getElementById('toggle-pwd');
+        const pwdInput = document.getElementById('id_password');
+        toggleBtn.addEventListener('click', () => {
+            const isHidden = pwdInput.type === 'password';
+            pwdInput.type = isHidden ? 'text' : 'password';
+            toggleBtn.classList.toggle('bx-hide', !isHidden);
+            toggleBtn.classList.toggle('bx-show', isHidden);
+        });
+    </script>
+</body>
+</html>

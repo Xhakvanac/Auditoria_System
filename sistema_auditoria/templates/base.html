@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Auditoría{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --surface-color: rgba(22, 27, 34, 0.75);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --primary-color: #58a6ff;
+            --primary-glow: rgba(88, 166, 255, 0.4);
+            --text-color: #c9d1d9;
+            --title-color: #f0f6fc;
+            --sidebar-width: 260px;
+            --accent-green: #238636;
+            --accent-red: #da3633;
+            --accent-purple: #bc8cff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(88, 166, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(188, 140, 255, 0.08) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--surface-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--surface-border);
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header i {
+            font-size: 28px;
+            color: var(--primary-color);
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        .sidebar-header h2 {
+            color: var(--title-color);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 16px;
+        }
+
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links li a i {
+            font-size: 20px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links li a:hover,
+        .nav-links li a.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--title-color);
+        }
+
+        .nav-links li a.active {
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--primary-color);
+            box-shadow: inset 3px 0 0 var(--primary-color);
+        }
+
+        .nav-links li a:hover i,
+        .nav-links li a.active i {
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 32px 48px;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Top Navigation Bar inside Main Content */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        .greeting h1 {
+            color: var(--title-color);
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .greeting p {
+            font-size: 14px;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-profile .icon-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-profile .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-purple));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Utility classes for blocks */
+        .glass-panel {
+            background: var(--surface-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .glass-panel:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Global Form Styles */
+        .glass-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--surface-border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--title-color);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .glass-input:focus {
+            border-color: var(--primary-color);
+            background: rgba(88, 166, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+        }
+
+        .glass-input option {
+            background-color: var(--bg-color);
+            color: var(--title-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-color);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            opacity: 0.8;
+        }
+    </style>
+    {% block extra_css %} {% endblock %}
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <i class='bx bx-check-shield'></i>
+            <h2>AuditFlow.</h2>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class='bx bx-grid-alt'></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'lista_auditorias' %}" class="{% if 'auditoria' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-folder-open'></i>
+                    <span>Auditorías</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'lista_hallazgos' %}" class="{% if 'hallazgo' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-search-alt'></i>
+                    <span>Hallazgos</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'lista_acciones' %}" class="{% if 'accion' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-wrench'></i>
+                    <span>Acciones Correct.</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'lista_evidencias' %}" class="{% if 'evidencia' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-file'></i>
+                    <span>Evidencias</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'lista_reportes' %}" class="{% if 'reporte' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-pie-chart-alt-2'></i>
+                    <span>Reportes</span>
+                </a>
+            </li>
+            {% if request.user.rol == 'administrador' or request.user.is_superuser %}
+            <li>
+                <a href="{% url 'lista_usuarios' %}" class="{% if 'usuario' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-group'></i>
+                    <span>Usuarios</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'lista_bitacora' %}" class="{% if 'bitacora' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-history'></i>
+                    <span>Bitácora</span>
+                </a>
+            </li>
+            {% endif %}
+            <li style="margin-top: auto; padding-top: 32px;">
+                <a href="{% url 'panel_configuracion' %}" class="{% if 'configuracion' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class='bx bx-cog'></i>
+                    <span>Configuración</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="greeting">
+                <h1>{% block page_title %}Resumen General{% endblock %}</h1>
+                 <p>{% block page_subtitle %}Bienvenido, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong> &mdash; {{ request.user.get_rol_display }}{% endblock %}</p>
+            </div>
+            
+            <div class="user-profile">
+                <button class="icon-btn" title="Notificaciones">
+                    <i class='bx bx-bell'></i>
+                </button>
+                <form action="{% url 'logout' %}" method="post" style="display: inline; margin: 0; padding: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="icon-btn" title="Cerrar sesión" style="border: none; background: var(--surface-color); cursor: pointer; padding: 0; display: flex; justify-content: center; align-items: center;">
+                        <i class='bx bx-log-out'></i>
+                    </button>
+                </form>
+                <div class="avatar" title="{{ request.user.username }}">
+                    {{ request.user.get_full_name|default:request.user.username|slice:':1'|upper }}
+                </div>
+            </div>
+        </header>
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

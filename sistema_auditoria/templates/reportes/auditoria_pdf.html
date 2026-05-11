@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Auditoría - {{ auditoria.folio }}</title>
+    <style>
+        @page {
+            size: {{ pagesize }};
+            margin: 2cm;
+            margin-bottom: 3cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #58a6ff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #0d1117;
+            margin: 0;
+            font-size: 20pt;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-table td {
+            padding: 5px;
+            font-size: 10pt;
+        }
+        .label {
+            font-weight: bold;
+            width: 120px;
+        }
+        .section-title {
+            background-color: #f0f6fc;
+            padding: 8px;
+            font-weight: bold;
+            border-left: 4px solid #58a6ff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 12pt;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .data-table th {
+            background-color: #58a6ff;
+            color: white;
+            text-align: left;
+            padding: 8px;
+            font-size: 9pt;
+        }
+        .data-table td {
+            border-bottom: 1px solid #ddd;
+            padding: 8px;
+            font-size: 9pt;
+            vertical-align: top;
+        }
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8pt;
+            font-weight: bold;
+            color: white;
+        }
+        .alta { background-color: #da3633; }
+        .media { background-color: #f2cc60; color: #333; }
+        .baja { background-color: #238636; }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 8pt;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>REPORTE DE AUDITORÍA</h1>
+        <p style="margin-top: 5px; font-weight: bold; color: #58a6ff;">{{ auditoria.folio }}</p>
+    </div>
+
+    <div class="info-section">
+        <table class="info-table">
+            <tr>
+                <td class="label">Título:</td>
+                <td>{{ auditoria.titulo }}</td>
+                <td class="label">Fecha Inicio:</td>
+                <td>{{ auditoria.fecha_inicio|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <td class="label">Área:</td>
+                <td>{{ auditoria.area }}</td>
+                <td class="label">Estado:</td>
+                <td>{{ auditoria.get_estado_display }}</td>
+            </tr>
+            <tr>
+                <td class="label">Norma:</td>
+                <td>{{ auditoria.norma|default:"N/A" }}</td>
+                <td class="label">Auditor Lider:</td>
+                <td>{{ auditoria.auditor_lider.get_full_name|default:auditoria.auditor_lider.username }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section-title">DESCRIPCIÓN Y OBJETIVO</div>
+    <p style="font-size: 10pt; text-align: justify;">{{ auditoria.descripcion|default:"Sin descripción registrada." }}</p>
+
+    <div class="section-title">ALCANCE</div>
+    <p style="font-size: 10pt; text-align: justify;">{{ auditoria.alcance|default:"Sin alcance definido." }}</p>
+
+    <div class="section-title">HALLAZGOS REGISTRADOS</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th width="10%">ID</th>
+                <th width="50%">Descripción</th>
+                <th width="15%">Criticidad</th>
+                <th width="15%">Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for h in hallazgos %}
+            <tr>
+                <td>HLZ-{{ h.id|stringformat:"03d" }}</td>
+                <td>
+                    <strong>{{ h.descripcion }}</strong>
+                    {% if h.acciones.all %}
+                    <div style="margin-top: 8px; padding: 6px; background-color: #f9f9f9; border-radius: 4px;">
+                        <span style="font-weight: bold; font-size: 8pt; color: #444;">Acciones Correctivas:</span>
+                        <ul style="margin: 4px 0 0 15px; padding: 0;">
+                            {% for acc in h.acciones.all %}
+                            <li style="font-size: 8pt; margin-bottom: 2px;">
+                                {{ acc.descripcion }} — 
+                                <span style="font-style: italic; color: #666;">({{ acc.get_estado_display }} - Responsable: {{ acc.responsable.get_full_name|default:acc.responsable.username }})</span>
+                                {% if acc.evidencias.all %}
+                                <div style="margin-top: 2px; color: #58a6ff; font-size: 7pt; font-family: monospace;">
+                                    📎 {% for ev in acc.evidencias.all %}{{ ev.descripcion|default:"Evidencia" }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge {{ h.criticidad|lower }}">
+                        {{ h.criticidad }}
+                    </span>
+                </td>
+                <td>{{ h.estado }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px;">No se registraron hallazgos en esta auditoría.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Generado por AuditFlow el {{ now|date:"d/m/Y H:i" }}</p>
+        <p>Documento confidencial para uso interno exclusivamente.</p>
+        <div style="text-align: right; margin-top: 10px;">
+            Página <pdf:pagenumber> de <pdf:pagecount>
+        </div>
+    </div>
+</body>
+</html>
