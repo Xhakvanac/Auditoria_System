@@ -1,8 +1,8 @@
-# 🛡️ AuditFlow — Sistema de Gestión de Auditorías
+# AuditFlow — Sistema de Gestión de Auditorías
 
 AuditFlow es una plataforma web premium diseñada para centralizar, gestionar y dar seguimiento a procesos de auditoría interna. Con una interfaz moderna basada en **Glassmorphism**, permite a los auditores reportar hallazgos, proponer acciones correctivas y gestionar evidencias de manera eficiente y segura.
 
-## 🚀 Características Principales
+## Características Principales
 
 - **Dashboard Inteligente**: Visualización de métricas críticas y progreso en tiempo real con gráficas dinámicas.
 - **Gestión de Usuarios**: Sistema de autenticación con roles (Administrador, Auditor Lider, Auditor, Auditado).
@@ -12,15 +12,15 @@ AuditFlow es una plataforma web premium diseñada para centralizar, gestionar y 
 - **Repositorio de Evidencias**: Carga y gestión de archivos probatorios (PDF, Imágenes, etc.).
 - **Trazabilidad Total**: Bitácora de sistema que registra cada evento para auditorías de cumplimiento.
 
-## 🛠️ Stack Tecnológico
+## Stack Tecnológico
 
-- **Backend**: Python 3.x / Django 6.x
-- **Base de Datos**: SQLite (desarrollo) / Compatible con PostgreSQL (producción)
+- **Backend**: Python / Django
+- **Base de Datos**: SQLite (desarrollo)
 - **Frontend**: HTML5, Vanilla CSS (Design System propio), JavaScript
 - **Gráficas**: Chart.js
 - **Iconografía**: Boxicons
 
-## 📦 Instalación y Configuración
+## Instalación y Configuración
 
 1. **Clonar el repositorio**:
    ```bash
@@ -57,7 +57,7 @@ AuditFlow es una plataforma web premium diseñada para centralizar, gestionar y 
    python manage.py run dev
    ```
 
-## 👥 Roles de Usuario Predeterminados
+## Roles de Usuario Predeterminados
 
 | Usuario | Contraseña | Rol |
 | :--- | :--- | :--- |
@@ -66,7 +66,7 @@ AuditFlow es una plataforma web premium diseñada para centralizar, gestionar y 
 | `auditor1` | `Audit123!` | Auditor |
 | `auditado1` | `Auditado123!` | Responsable / Auditado |
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```text
 ├── sistema_auditoria/      # Configuración central del proyecto
@@ -80,5 +80,3 @@ AuditFlow es una plataforma web premium diseñada para centralizar, gestionar y 
 └── media/                  # Almacenamiento de archivos subidos
 ```
 
----
-*Desarrollado con enfoque en Excelencia Visual y Trazabilidad.*
