@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from .views import DashboardView
+from .api_views import DashboardAPIView, HallazgosAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,6 +34,10 @@ urlpatterns = [
     path('reportes/', include('reportes.urls')),
     path('configuracion/', include('configuracion.urls')),
     path('bitacora/', include('bitacora.urls')),
+    path('notificaciones/', include('notificaciones.urls')),
+    # API Endpoints for Performance Testing
+    path('api/dashboard/', DashboardAPIView.as_view(), name='api_dashboard'),
+    path('api/hallazgos/', HallazgosAPIView.as_view(), name='api_hallazgos'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Configuración - AuditFlow{% endblock %}
+{% block page_title %}Configuración del Sistema{% endblock %}
+{% block page_subtitle %}Administra tu perfil, preferencias de notificaciones y parámetros generales de la aplicación.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    /* Menú lateral de configuración */
+    .settings-sidebar {
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        padding: 16px 0;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .settings-menu {
+        list-style: none;
+    }
+
+    .settings-menu li {
+        padding: 0 16px;
+        margin-bottom: 4px;
+    }
+
+    .settings-menu a {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        color: var(--text-color);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+
+    .settings-menu a i {
+        font-size: 20px;
+        margin-right: 12px;
+    }
+
+    .settings-menu a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--title-color);
+    }
+
+    .settings-menu a.active {
+        background: rgba(88, 166, 255, 0.1);
+        color: var(--primary-color);
+    }
+
+    /* Panel Principal */
+    .settings-panel {
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        padding: 32px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .panel-header {
+        margin-bottom: 24px;
+        border-bottom: 1px solid var(--surface-border);
+        padding-bottom: 16px;
+    }
+
+    .panel-header h3 {
+        color: var(--title-color);
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .panel-header p {
+        color: var(--text-color);
+        font-size: 14px;
+    }
+
+    /* Formularios Premium */
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--title-color);
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid var(--surface-border);
+        color: var(--title-color);
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+    }
+
+    .form-control:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-save {
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(88, 166, 255, 0.4);
+    }
+
+    /* Mensajes de Alerta (Flash) */
+    .alert {
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .alert-success { background: rgba(35, 134, 54, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); }
+    .alert-error { background: rgba(218, 54, 51, 0.1); border: 1px solid var(--accent-red); color: var(--accent-red); }
+</style>
+{% block config_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <!-- Menú de opciones de configuración -->
+    <aside class="settings-sidebar">
+        <ul class="settings-menu">
+            <li>
+                <a href="{% url 'panel_perfil' %}" class="{% if request.resolver_match.url_name == 'panel_perfil' %}active{% endif %}">
+                    <i class='bx bx-user-circle'></i> Perfil del Usuario
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'panel_notificaciones' %}" class="{% if request.resolver_match.url_name == 'panel_notificaciones' %}active{% endif %}">
+                    <i class='bx bx-bell'></i> Preferencias de Notificación
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'panel_seguridad' %}" class="{% if request.resolver_match.url_name == 'panel_seguridad' %}active{% endif %}">
+                    <i class='bx bx-shield-quarter'></i> Seguridad y Contraseñas
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'panel_sistema' %}" class="{% if request.resolver_match.url_name == 'panel_sistema' %}active{% endif %}">
+                    <i class='bx bx-server'></i> Preferencias del Sistema
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Contenido del Panel -->
+    <main class="settings-panel">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block config_content %}
+        {% endblock %}
+    </main>
+</div>
+{% endblock %}

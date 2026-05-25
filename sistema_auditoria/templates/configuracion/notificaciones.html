@@ -1,0 +1,40 @@
+{% extends 'configuracion/base_config.html' %}
+
+{% block config_content %}
+<div class="panel-header">
+    <h3>Preferencias de Notificación</h3>
+    <p>Configura cómo deseas que el sistema se comunique contigo.</p>
+</div>
+
+<form action="{% url 'panel_notificaciones' %}" method="post">
+    {% csrf_token %}
+    
+    <div class="toggle-wrapper">
+        <div class="toggle-info">
+            <h4>Notificaciones por Email</h4>
+            <p>Recibir correos cuando se te asigne un nuevo hallazgo o acción correctiva.</p>
+        </div>
+        <label class="switch">
+            <input type="checkbox" name="recibir_correos" {% if form.recibir_correos.value %}checked{% endif %}>
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="toggle-wrapper">
+        <div class="toggle-info">
+            <h4>Tema Oscuro Permanente</h4>
+            <p>Fuerza la interfaz oscura ignorando la preferencia de tu sistema operativo.</p>
+        </div>
+        <label class="switch">
+            <input type="checkbox" name="tema_oscuro" {% if form.tema_oscuro.value %}checked{% endif %}>
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div style="margin-top: 32px; text-align: right;">
+        <button type="submit" class="btn-save">
+            <i class='bx bx-save'></i> Guardar Preferencias
+        </button>
+    </div>
+</form>
+{% endblock %}

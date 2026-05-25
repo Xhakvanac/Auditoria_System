@@ -197,6 +197,23 @@
             font-size: 16px;
         }
 
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background-color: var(--accent-red);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid var(--surface-color);
+        }
+
         /* Scrollbar styles */
         ::-webkit-scrollbar {
             width: 8px;
@@ -344,9 +361,12 @@
             </div>
             
             <div class="user-profile">
-                <button class="icon-btn" title="Notificaciones">
+                <a href="{% url 'lista_notificaciones' %}" class="icon-btn" title="Notificaciones" style="position: relative; text-decoration: none;">
                     <i class='bx bx-bell'></i>
-                </button>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
                 <form action="{% url 'logout' %}" method="post" style="display: inline; margin: 0; padding: 0;">
                     {% csrf_token %}
                     <button type="submit" class="icon-btn" title="Cerrar sesión" style="border: none; background: var(--surface-color); cursor: pointer; padding: 0; display: flex; justify-content: center; align-items: center;">

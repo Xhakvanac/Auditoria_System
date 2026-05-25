@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificaciones - AuditFlow{% endblock %}
+{% block page_title %}Mis Notificaciones{% endblock %}
+{% block page_subtitle %}Mantente al día con las alertas y asignaciones del sistema.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notificaciones-container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .notificacion-card {
+        background: var(--surface-color);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        padding: 20px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .notificacion-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .notificacion-card.no-leida {
+        border-left: 4px solid var(--primary-color);
+        background: linear-gradient(90deg, rgba(88, 166, 255, 0.05) 0%, var(--surface-color) 100%);
+    }
+
+    .notificacion-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+
+    .icon-info { background: rgba(88, 166, 255, 0.1); color: var(--primary-color); }
+    .icon-success { background: rgba(35, 134, 54, 0.1); color: var(--accent-green); }
+    .icon-warning { background: rgba(210, 153, 34, 0.1); color: #d29922; }
+    .icon-error { background: rgba(218, 54, 51, 0.1); color: var(--accent-red); }
+
+    .notificacion-content {
+        flex: 1;
+    }
+
+    .notificacion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .notificacion-title {
+        color: var(--title-color);
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .notificacion-time {
+        color: var(--text-color);
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
+    .notificacion-message {
+        color: var(--text-color);
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0 0 12px 0;
+    }
+
+    .notificacion-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid var(--surface-border);
+        background: transparent;
+        color: var(--text-color);
+        cursor: pointer;
+    }
+
+    .btn-action:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--title-color);
+    }
+
+    .btn-action.primary {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+    }
+
+    .btn-action.primary:hover {
+        background: #478cdd;
+    }
+
+    .marcar-todas-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 16px;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        background: var(--surface-color);
+        border: 1px dashed var(--surface-border);
+        border-radius: 12px;
+        color: var(--text-color);
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        opacity: 0.5;
+        margin-bottom: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% if notificaciones %}
+<div class="marcar-todas-container">
+    <a href="{% url 'marcar_todas_notificaciones_leidas' %}" class="btn-action">
+        <i class='bx bx-check-double'></i> Marcar todas como leídas
+    </a>
+</div>
+{% endif %}
+
+<div class="notificaciones-container">
+    {% for notificacion in notificaciones %}
+        <div class="notificacion-card {% if not notificacion.leida %}no-leida{% endif %}">
+            <div class="notificacion-icon icon-{{ notificacion.tipo }}">
+                {% if notificacion.tipo == 'info' %}<i class='bx bx-info-circle'></i>{% endif %}
+                {% if notificacion.tipo == 'success' %}<i class='bx bx-check-circle'></i>{% endif %}
+                {% if notificacion.tipo == 'warning' %}<i class='bx bx-error'></i>{% endif %}
+                {% if notificacion.tipo == 'error' %}<i class='bx bx-error-circle'></i>{% endif %}
+            </div>
+            <div class="notificacion-content">
+                <div class="notificacion-header">
+                    <h4 class="notificacion-title">{{ notificacion.titulo }}</h4>
+                    <span class="notificacion-time">{{ notificacion.fecha_creacion|timesince }} hace</span>
+                </div>
+                <p class="notificacion-message">{{ notificacion.mensaje }}</p>
+                <div class="notificacion-actions">
+                    {% if not notificacion.leida %}
+                    <a href="{% url 'marcar_leida_notificacion' notificacion.id %}" class="btn-action primary">
+                        <i class='bx bx-check'></i> Marcar como leída
+                    </a>
+                    {% endif %}
+                    {% if notificacion.enlace %}
+                    <a href="{{ notificacion.enlace }}" class="btn-action">
+                        <i class='bx bx-link-external'></i> Ver detalle
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            <i class='bx bx-bell-off'></i>
+            <h3>No tienes notificaciones</h3>
+            <p>Estás al día con todas tus alertas y asignaciones.</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'configuracion/base_config.html' %}
+
+{% block config_content %}
+<div class="panel-header">
+    <h3>Información Personal</h3>
+    <p>Actualiza los detalles de tu cuenta y tu rol dentro del sistema de auditoría.</p>
+</div>
+
+<form action="{% url 'panel_perfil' %}" method="post">
+    {% csrf_token %}
+    <div style="display: flex; gap: 24px; margin-bottom: 20px;">
+        <div class="form-group" style="flex: 1;">
+            <label>Nombre(s)</label>
+            <input type="text" name="first_name" class="form-control" value="{{ form.first_name.value|default:'' }}">
+            {% if form.first_name.errors %}<div style="color:var(--accent-red); font-size:12px;">{{ form.first_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label>Apellidos</label>
+            <input type="text" name="last_name" class="form-control" value="{{ form.last_name.value|default:'' }}">
+            {% if form.last_name.errors %}<div style="color:var(--accent-red); font-size:12px;">{{ form.last_name.errors.0 }}</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Correo Electrónico</label>
+        <input type="email" name="email" class="form-control" value="{{ form.email.value|default:'' }}">
+        {% if form.email.errors %}<div style="color:var(--accent-red); font-size:12px;">{{ form.email.errors.0 }}</div>{% endif %}
+    </div>
+
+    <div style="display: flex; gap: 24px; margin-bottom: 20px;">
+        <div class="form-group" style="flex: 1;">
+            <label>Rol en el Sistema</label>
+            <input type="text" class="form-control" value="{{ perfil.get_rol_display }}" disabled title="Solo un administrador puede cambiar tu rol">
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label>Última Sesión</label>
+            <input type="text" class="form-control" value="{{ perfil.last_login|date:'d M Y, H:i'|default:'N/A' }}" disabled>
+        </div>
+    </div>
+
+    <div style="margin-top: 32px; text-align: right;">
+        <button type="submit" class="btn-save">
+            <i class='bx bx-save'></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+{% endblock %}
